@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 3000;
 // 🔹 Configura el verificador de tokens
 const oktaJwtVerifier = new OktaJwtVerifier({
   issuer: 'https://fernandosandbox.oktapreview.com/oauth2/ausbxl4gmakGkhLXy0x7',
-  audience: 'api://default',
+  audience: 'https://api.casa.local',
 });
 
 // 🔹 Middleware de verificación general
