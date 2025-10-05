@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Perfil de Usuario</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body{font-family:system-ui,Arial;margin:0;background:#0f172a;color:#e2e8f0}
+    .card{max-width:720px;margin:3rem auto;padding:2rem;border-radius:16px;background:#111827;box-shadow:0 10px 30px #0006}
+    h1{margin-bottom:1rem;font-size:1.6rem}
+    pre{white-space:pre-wrap;background:#0b1220;padding:12px;border-radius:10px}
+    button{padding:.6rem 1rem;border-radius:10px;border:0;background:#6366f1;color:#fff;cursor:pointer}
+    button:hover{filter:brightness(1.1)}
+  </style>
+  <script src="https://global.oktacdn.com/okta-auth-js/7.4.1/okta-auth-js.min.js"></script>
+</head>
+<body>
+  <div class="card">
+    <h1>👤 Perfil de usuario autenticado</h1>
+    <div id="info">Cargando datos...</div>
+    <pre id="claims"></pre>
+    <button onclick="logout()">Cerrar sesión</button>
+  </div>
+
+  <script>
+  const okta = new OktaAuth({
+    issuer: 'https://fernandosandbox.oktapreview.com/oauth2/ausbxl4gmakGkhLXy0x7',
+    clientId: '0oabxlr5i4pTyCaAM0x7',
+    redirectUri: window.location.origin + '/callback',
+    scopes: ['openid','profile','email','user.read'],
+    pkce: true,
+    tokenManager: { storage: 'sessionStorage' }
+  });
+
+  async function renderProfile(){
+    const tokens = await okta.tokenManager.getTokens();
+    if(!tokens.idToken){
+      window.location.href='/login'; // si no hay sesión, redirige a login
+      return;
+    }
+    const claims = tokens.idToken.claims;
+    document.getElementById('info').innerHTML =
+      `<b>Nombre:</b> ${claims.name || '(sin nombre)'}<br>
+       <b>Email:</b> ${claims.email || '(sin email)'}<br>
+       <b>Issuer:</b> ${claims.iss}`;
+    document.getElementById('claims').textContent =
+      JSON.stringify(claims,null,2);
+  }
+
+  async function logout(){
+    await okta.signOut();
+    sessionStorage.clear();
+    location.href='/';
+  }
+
+  renderProfile();
+  </script>
+</body>
+</html>
