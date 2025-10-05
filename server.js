@@ -25,21 +25,20 @@ async function requireAuth(req, res, next) {
 
 // 🔹 Middleware para exigir un scope específico
 function requireScope(scope) {
-  return async (req, res, next) => {
+  return async (req,res,next)=>{
     try {
-      const authHeader = req.headers.authorization || '';
-      const token = authHeader.replace('Bearer ', '');
-      const { claims } = await oktaJwtVerifier.verifyAccessToken(token);
-      if (!claims.scp?.includes(scope)) {
-        return res.status(403).send('Forbidden – scope missing: ' + scope);
-      }
+      const token = (req.headers.authorization||'').replace('Bearer ','');
+      const { claims } = await oktaJwtVerifier.verifyAccessToken(token, 'api://default'); // issuer/aud/exp OK
+      if (claims.tok_typ && claims.tok_typ !== 'Bearer') return res.status(401).send('Wrong token type');
+      if (!claims.scp?.includes(scope)) return res.status(403).send('Forbidden');
+      // opcional: if (claims.azp !== EXPECTED_CLIENT_ID) return res.status(403).send('Bad azp');
+      req.user = claims; // pasa claims a controladores
       next();
-    } catch (err) {
-      console.error('❌ Error en requireScope:', err.message);
-      return res.status(401).send('Unauthorized');
-    }
+    } catch (e) { return res.status(401).send('Unauthorized'); }
   };
 }
+app.get('/users',  requireScope('user.read'),  handlerRead);
+app.post('/users', requireScope('user.write'), handlerWrite);
 
 // 🔹 Páginas públicas
 app.get('/', (_r, res) => res.sendFile(path.join(__dirname, 'index.html')));
