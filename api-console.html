@@ -1,0 +1,38 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"/>
+<title>API Console</title><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<style>body{font-family:system-ui;background:#0f172a;color:#e2e8f0;margin:0;padding:24px}
+.card{background:#111827;border-radius:14px;max-width:820px;margin:0 auto;padding:18px;box-shadow:0 10px 30px #0006}
+button{background:#6366f1;border:0;color:#fff;padding:.6rem 1rem;border-radius:10px;cursor:pointer;margin-right:8px}
+pre{white-space:pre-wrap;background:#0b1220;padding:12px;border-radius:10px;margin-top:12px}</style>
+<script src="https://global.oktacdn.com/okta-auth-js/7.4.1/okta-auth-js.min.js"></script></head>
+<body><div class="card">
+<h2>🔧 API Console</h2>
+<p>Debes iniciar sesión antes (PKCE). Usa los botones:</p>
+<div>
+  <button id="btnRead">GET /users  (scope: user.read)</button>
+  <button id="btnWrite">POST /users (scope: user.write)</button>
+</div>
+<pre id="out">Listo.</pre>
+</div>
+<script>
+const okta=new OktaAuth({
+  issuer:'https://fernandosandbox.oktapreview.com/oauth2/ausbxl4gmakGkhLXy0x7',
+  clientId:'0oabxlr5i4pTyCaAM0x7',
+  redirectUri:window.location.origin+'/callback',
+  scopes:['openid','profile','email','user.read','user.write'],
+  pkce:true, tokenManager:{storage:'sessionStorage'}
+});
+async function call(method,path,body){
+  try{
+    const {accessToken}=await okta.tokenManager.getTokens();
+    const r=await fetch(path,{method,headers:{
+      'Authorization':'Bearer '+accessToken.accessToken,
+      'Content-Type':'application/json'
+    }, body: body?JSON.stringify(body):undefined});
+    const t=await r.text();
+    out.textContent = method+' '+path+' → '+r.status+'\n\n'+t;
+  }catch(e){ out.textContent='❌ '+e; }
+}
+btnRead.onclick = ()=>call('GET','/users');
+btnWrite.onclick= ()=>call('POST','/users',{demo:true,name:'Alice'});
+</script></body></html>
