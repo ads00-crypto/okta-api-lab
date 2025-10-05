@@ -1,29 +1,5 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="utf-8" />
-  <title>Login PKCE • Demo</title>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://global.oktacdn.com https://*.oktapreview.com https://*.okta.com; style-src 'self' 'unsafe-inline';"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    body{font-family:system-ui,Arial;margin:0;background:#0f172a;color:#e2e8f0}
-    .card{max-width:640px;margin:6rem auto;padding:2rem;border-radius:16px;background:#111827;box-shadow:0 10px 30px #0006}
-    h1{margin:0 0 8px;font-size:1.6rem}
-    p{opacity:.8}
-    button{padding:.8rem 1.1rem;border-radius:10px;border:0;background:#6366f1;color:#fff;font-weight:600;cursor:pointer}
-    button:hover{filter:brightness(1.1)}
-    code{background:#0b1220;padding:.2rem .4rem;border-radius:6px}
-  </style>
-  <script src="https://global.oktacdn.com/okta-auth-js/7.4.1/okta-auth-js.min.js"></script>
-</head>
 <body>
-  <div class="card">
-    <h1>🔐 Okta PKCE Demo</h1>
-    <p>Authorization Code</code>.</p>
-    <button id="loginBtn">Iniciar sesión</button>
-    <p id="msg" style="margin-top:14px;"></p>
-  </div>
-
+  <h2>Redirigiendo a Okta…</h2>
   <script>
     const authClient = new OktaAuth({
       issuer: 'https://fernandosandbox.oktapreview.com/oauth2/ausbxl4gmakGkhLXy0x7',
@@ -33,15 +9,6 @@
       pkce: true,
       tokenManager: { storage: 'sessionStorage' }
     });
-
-    document.getElementById('loginBtn').addEventListener('click', async () => {
-      try {
-        document.getElementById('msg').textContent = 'Redirigiendo a Okta…';
-        await authClient.token.getWithRedirect({ responseType: 'code' });
-      } catch (e) {
-        document.getElementById('msg').textContent = '❌ Error: ' + e;
-      }
-    });
+    authClient.token.getWithRedirect({ responseType: 'code' });
   </script>
 </body>
-</html>
