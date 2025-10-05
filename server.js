@@ -23,12 +23,12 @@ async function requireAuth(req, res, next) {
   }
 }
 
-// 🔹 Middleware para exigir un scope específico
+// 🔹 Middleware para exigir un scope
 function requireScope(scope) {
   return async (req,res,next)=>{
     try {
       const token = (req.headers.authorization||'').replace('Bearer ','');
-      const { claims } = await oktaJwtVerifier.verifyAccessToken(token, 'api://default'); // issuer/aud/exp OK
+      const { claims } = await oktaJwtVerifier.verifyAccessToken(token, '	https://okta-auth0-api-lab.onrender.com/'); // issuer/aud/exp OK
       if (claims.tok_typ && claims.tok_typ !== 'Bearer') return res.status(401).send('Wrong token type');
       if (!claims.scp?.includes(scope)) return res.status(403).send('Forbidden');
       // opcional: if (claims.azp !== EXPECTED_CLIENT_ID) return res.status(403).send('Bad azp');
