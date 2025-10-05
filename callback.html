@@ -34,6 +34,8 @@ const okta = new OktaAuth({
   pkce: true,
   tokenManager: { storage: 'sessionStorage' }
 });
+// Make available globally so the browser console and other pages can access tokenManager
+window.okta = okta;
 
 function mask(t){return t? t.slice(0,16)+'…'+t.slice(-16):'(sin valor)';}
 

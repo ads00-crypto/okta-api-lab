@@ -1,38 +1,242 @@
 <!DOCTYPE html><html lang="es"><head><meta charset="utf-8"/>
-<title>API Console</title><meta name="viewport" content="width=device-width, initial-scale=1"/>
-<style>body{font-family:system-ui;background:#0f172a;color:#e2e8f0;margin:0;padding:24px}
-.card{background:#111827;border-radius:14px;max-width:820px;margin:0 auto;padding:18px;box-shadow:0 10px 30px #0006}
-button{background:#6366f1;border:0;color:#fff;padding:.6rem 1rem;border-radius:10px;cursor:pointer;margin-right:8px}
-pre{white-space:pre-wrap;background:#0b1220;padding:12px;border-radius:10px;margin-top:12px}</style>
+<title>API Console - Okta Lab</title><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<style>
+body{font-family:system-ui;background:#0f172a;color:#e2e8f0;margin:0;padding:24px}
+.card{background:#111827;border-radius:14px;max-width:1000px;margin:0 auto;padding:24px;box-shadow:0 10px 30px #0006}
+.section{margin-bottom:24px;padding:16px;background:#1e293b;border-radius:12px}
+.section h3{margin-top:0;color:#60a5fa;border-bottom:2px solid #374151;padding-bottom:8px}
+button{background:#6366f1;border:0;color:#fff;padding:.7rem 1.2rem;border-radius:8px;cursor:pointer;margin:4px;transition:all 0.2s}
+button:hover{background:#5b59f0;transform:translateY(-1px)}
+button.success{background:#059669}
+button.warning{background:#d97706}
+button.danger{background:#dc2626}
+.scope-badge{background:#374151;color:#a5b4fc;padding:2px 8px;border-radius:4px;font-size:12px;margin-left:8px}
+pre{white-space:pre-wrap;background:#0b1220;padding:16px;border-radius:10px;margin-top:12px;border:1px solid #374151;max-height:400px;overflow-y:auto}
+.input-group{margin:8px 0}
+.input-group input{background:#374151;border:1px solid #4b5563;color:#e2e8f0;padding:8px 12px;border-radius:6px;margin-right:8px}
+.token-status{padding:8px 12px;border-radius:6px;margin-bottom:16px}
+.token-valid{background:#065f46;border:1px solid #059669}
+.token-invalid{background:#7f1d1d;border:1px solid #dc2626}
+</style>
 <script src="https://global.oktacdn.com/okta-auth-js/7.4.1/okta-auth-js.min.js"></script></head>
 <body><div class="card">
-<h2>🔧 API Console</h2>
-<p>Debes iniciar sesión antes (PKCE). Usa los botones:</p>
-<div>
-  <button id="btnRead">GET /users  (scope: user.read)</button>
-  <button id="btnWrite">POST /users (scope: user.write)</button>
+<h2>🔧 API Console - Okta Lab</h2>
+<div id="tokenStatus" class="token-status token-invalid">❌ No autenticado</div>
+
+<!-- Endpoints Públicos -->
+<div class="section">
+  <h3>🌐 Endpoints Públicos</h3>
+  <button id="btnInfo" class="success">GET /api/info</button>
+  <button id="btnHealth" class="success">GET /api/health</button>
 </div>
-<pre id="out">Listo.</pre>
+
+<!-- Autenticación Básica -->
+<div class="section">
+  <h3>🔑 Autenticación Básica</h3>
+  <button id="btnMe">GET /api/me <span class="scope-badge">token requerido</span></button>
+</div>
+
+<!-- Usuarios (user.read / user.write) -->
+<div class="section">
+  <h3>👥 Gestión de Usuarios</h3>
+  <button id="btnUsersRead">GET /api/users <span class="scope-badge">user.read</span></button>
+  <button id="btnUserById">GET /api/users/:id <span class="scope-badge">user.read</span></button>
+  <div class="input-group">
+    <input type="number" id="userId" placeholder="ID de usuario" value="1">
+  </div>
+  <button id="btnUsersWrite" class="warning">POST /api/users <span class="scope-badge">user.write</span></button>
+  <div class="input-group">
+    <input type="text" id="userName" placeholder="Nombre" value="Nuevo Usuario">
+    <input type="email" id="userEmail" placeholder="Email" value="nuevo@test.com">
+    <input type="text" id="userRole" placeholder="Rol" value="user">
+  </div>
+</div>
+
+<!-- Productos (product.read / product.write) -->
+<div class="section">
+  <h3>🛍️ Gestión de Productos</h3>
+  <button id="btnProductsRead">GET /api/products <span class="scope-badge">product.read</span></button>
+  <button id="btnProductsWrite" class="warning">POST /api/products <span class="scope-badge">product.write</span></button>
+  <div class="input-group">
+    <input type="text" id="productName" placeholder="Nombre del producto" value="Producto Nuevo">
+    <input type="number" id="productPrice" placeholder="Precio" value="99.99">
+    <input type="text" id="productCategory" placeholder="Categoría" value="general">
+  </div>
+</div>
+
+<!-- Administración (admin scope + grupos) -->
+<div class="section">
+  <h3>⚡ Administración - Niveles de Seguridad</h3>
+  <button id="btnAdminLegacy" class="warning">GET /api/admin/legacy <span class="scope-badge">solo admin scope</span></button>
+  <button id="btnAdminBasic" class="danger">GET /api/admin/basic-info <span class="scope-badge">Mi casa - Admin</span></button>
+  <button id="btnAdminStats" class="danger">GET /api/admin/stats <span class="scope-badge">admin + Mi casa - Admin</span></button>
+  <button id="btnAdminDeleteUser" style="background:#991b1b">DELETE /api/admin/users/:id <span class="scope-badge">admin + grupo + claim</span></button>
+  <div class="input-group">
+    <input type="number" id="deleteUserId" placeholder="ID del usuario a eliminar" value="3">
+  </div>
+</div>
+
+<!-- Endpoints por grupo -->
+<div class="section">
+  <h3>🏠 Endpoints por Grupo</h3>
+  <button id="btnUserProfile">GET /api/user/profile <span class="scope-badge">Mi casa - User</span></button>
+  <button id="btnCommonInfo" class="success">GET /api/common/info <span class="scope-badge">Admin o User</span></button>
+  <small style="color:#fbbf24">⚠️ Los endpoints seguros requieren pertenecer a los grupos específicos de "Mi casa"</small>
+</div>
+
+<pre id="out">🚀 Consola lista. Selecciona un endpoint para probar...</pre>
 </div>
 <script>
-const okta=new OktaAuth({
-  issuer:'https://fernandosandbox.oktapreview.com/oauth2/ausbxl4gmakGkhLXy0x7',
-  clientId:'0oabxlr5i4pTyCaAM0x7',
-  redirectUri:window.location.origin+'/callback',
-  scopes:['openid','profile','email','user.read','user.write'],
-  pkce:true, tokenManager:{storage:'sessionStorage'}
+const okta = new OktaAuth({
+  issuer: 'https://fernandosandbox.oktapreview.com/oauth2/ausbxl4gmakGkhLXy0x7',
+  clientId: '0oabxlr5i4pTyCaAM0x7',
+  redirectUri: window.location.origin + '/callback',
+  scopes: ['openid', 'profile', 'email', 'user.read', 'user.write', 'product.read', 'product.write', 'admin'],
+  pkce: true,
+  tokenManager: { storage: 'sessionStorage' }
 });
-async function call(method,path,body){
-  try{
-    const {accessToken}=await okta.tokenManager.getTokens();
-    const r=await fetch(path,{method,headers:{
-      'Authorization':'Bearer '+accessToken.accessToken,
-      'Content-Type':'application/json'
-    }, body: body?JSON.stringify(body):undefined});
-    const t=await r.text();
-    out.textContent = method+' '+path+' → '+r.status+'\n\n'+t;
-  }catch(e){ out.textContent='❌ '+e; }
+// Expose as a global for debugging / console snippets (okta.tokenManager.getTokens())
+window.okta = okta;
+
+// Verificar estado del token al cargar
+async function checkTokenStatus() {
+  try {
+    const tokens = await okta.tokenManager.getTokens();
+    if (tokens.accessToken) {
+      const tokenStatus = document.getElementById('tokenStatus');
+      tokenStatus.className = 'token-status token-valid';
+      const scopes = tokens.accessToken.claims?.scp || [];
+      const exp = tokens.accessToken.claims?.exp ? new Date(tokens.accessToken.claims.exp * 1000).toLocaleString() : 'desconocido';
+      tokenStatus.textContent = `✅ Token válido - Scopes: ${scopes.join(', ') || 'No scopes'} - Expira: ${exp}`;
+    }
+  } catch (e) {
+    console.log('No hay token válido');
+  }
 }
-btnRead.onclick = ()=>call('GET','/users');
-btnWrite.onclick= ()=>call('POST','/users',{demo:true,name:'Alice'});
+
+// Devuelve el string del access token o null si no hay token válido
+async function ensureAccessToken() {
+  try {
+    const tokens = await okta.tokenManager.getTokens();
+    if (!tokens || !tokens.accessToken) return null;
+
+    // Si el token contiene claims.exp verificamos expiración
+    const exp = tokens.accessToken.claims?.exp;
+    if (exp) {
+      const expiresAt = exp * 1000;
+      if (Date.now() > expiresAt) {
+        return null; // expirado
+      }
+    }
+
+    // tokenManager devuelve el objeto con accessToken.accessToken
+    return tokens.accessToken.accessToken || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+// Función genérica para hacer llamadas a la API
+async function call(method, path, body, buttonId) {
+  const button = document.getElementById(buttonId);
+  const originalText = button.textContent;
+  button.textContent = '⏳ Cargando...';
+  button.disabled = true;
+  
+  try {
+    let headers = { 'Content-Type': 'application/json' };
+    
+    // Solo agregar token si no es endpoint público
+    if (!path.includes('/api/info') && !path.includes('/api/health')) {
+      const accessTokenString = await ensureAccessToken();
+      if (!accessTokenString) {
+        document.getElementById('out').textContent = '🔒 No hay un token de acceso válido. Haz login desde /login y acepta los permisos.';
+        return;
+      }
+      headers['Authorization'] = 'Bearer ' + accessTokenString;
+    }
+    
+    const response = await fetch(path, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined
+    });
+    
+    const responseText = await response.text();
+    let formattedResponse;
+    
+    try {
+      const jsonResponse = JSON.parse(responseText);
+      formattedResponse = JSON.stringify(jsonResponse, null, 2);
+    } catch {
+      formattedResponse = responseText;
+    }
+    
+    document.getElementById('out').textContent = 
+      `${method} ${path} → ${response.status} ${response.statusText}\n\n${formattedResponse}`;
+      
+  } catch (e) {
+    document.getElementById('out').textContent = '❌ Error: ' + e.message;
+  } finally {
+    button.textContent = originalText;
+    button.disabled = false;
+  }
+}
+
+// Event listeners para todos los botones
+document.addEventListener('DOMContentLoaded', () => {
+  checkTokenStatus();
+  // Actualizar el estado del token cada 15 segundos para reflejar cambios (login/logout, expiración, cambios de grupos tras re-login)
+  setInterval(checkTokenStatus, 15000);
+  
+  // Endpoints públicos
+  document.getElementById('btnInfo').onclick = () => call('GET', '/api/info', null, 'btnInfo');
+  document.getElementById('btnHealth').onclick = () => call('GET', '/api/health', null, 'btnHealth');
+  
+  // Autenticación básica
+  document.getElementById('btnMe').onclick = () => call('GET', '/api/me', null, 'btnMe');
+  
+  // Usuarios
+  document.getElementById('btnUsersRead').onclick = () => call('GET', '/api/users', null, 'btnUsersRead');
+  
+  document.getElementById('btnUserById').onclick = () => {
+    const userId = document.getElementById('userId').value;
+    call('GET', `/api/users/${userId}`, null, 'btnUserById');
+  };
+  
+  document.getElementById('btnUsersWrite').onclick = () => {
+    const userData = {
+      name: document.getElementById('userName').value,
+      email: document.getElementById('userEmail').value,
+      role: document.getElementById('userRole').value
+    };
+    call('POST', '/api/users', userData, 'btnUsersWrite');
+  };
+  
+  // Productos
+  document.getElementById('btnProductsRead').onclick = () => call('GET', '/api/products', null, 'btnProductsRead');
+  
+  document.getElementById('btnProductsWrite').onclick = () => {
+    const productData = {
+      name: document.getElementById('productName').value,
+      price: parseFloat(document.getElementById('productPrice').value),
+      category: document.getElementById('productCategory').value
+    };
+    call('POST', '/api/products', productData, 'btnProductsWrite');
+  };
+  
+  // Administración - diferentes niveles de seguridad
+  document.getElementById('btnAdminLegacy').onclick = () => call('GET', '/api/admin/legacy', null, 'btnAdminLegacy');
+  document.getElementById('btnAdminBasic').onclick = () => call('GET', '/api/admin/basic-info', null, 'btnAdminBasic');
+  document.getElementById('btnAdminStats').onclick = () => call('GET', '/api/admin/stats', null, 'btnAdminStats');
+  
+  document.getElementById('btnAdminDeleteUser').onclick = () => {
+    const userId = document.getElementById('deleteUserId').value;
+    call('DELETE', `/api/admin/users/${userId}`, null, 'btnAdminDeleteUser');
+  };
+  
+  // Endpoints por grupo
+  document.getElementById('btnUserProfile').onclick = () => call('GET', '/api/user/profile', null, 'btnUserProfile');
+  document.getElementById('btnCommonInfo').onclick = () => call('GET', '/api/common/info', null, 'btnCommonInfo');
+});
 </script></body></html>

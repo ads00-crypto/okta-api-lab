@@ -2,25 +2,83 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <title>Okta Demo • Inicio</title>
+  <title>Okta API Lab • Inicio</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body{font-family:system-ui,Arial;margin:0;background:#0f172a;color:#e2e8f0;text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh}
-    h1{font-size:2rem;margin-bottom:1rem}
-    p{opacity:.8;max-width:520px}
-    button{padding:1rem 1.5rem;border:0;border-radius:12px;background:#6366f1;color:white;font-size:1rem;font-weight:600;cursor:pointer;box-shadow:0 6px 16px #0005}
-    button:hover{filter:brightness(1.1)}
-    footer{position:absolute;bottom:20px;opacity:.6;font-size:.9rem}
+    body{font-family:system-ui,Arial;margin:0;background:#0f172a;color:#e2e8f0;padding:2rem}
+    .container{max-width:900px;margin:0 auto;text-align:center}
+    h1{font-size:2.5rem;margin-bottom:1rem;background:linear-gradient(135deg,#6366f1,#8b5cf6);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .description{opacity:.8;max-width:600px;margin:0 auto 2rem;line-height:1.6}
+    .scope-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem;margin:2rem 0}
+    .scope-card{background:#1e293b;border-radius:12px;padding:1.5rem;border:2px solid #374151;transition:all 0.3s}
+    .scope-card:hover{border-color:#6366f1;transform:translateY(-2px)}
+    .scope-card h3{color:#60a5fa;margin-bottom:.5rem;font-size:1.1rem}
+    .scope-badge{background:#374151;color:#a5b4fc;padding:4px 8px;border-radius:6px;font-size:12px;font-weight:600}
+    .buttons{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2rem}
+    button{padding:1rem 1.5rem;border:0;border-radius:12px;font-size:1rem;font-weight:600;cursor:pointer;transition:all 0.3s;text-decoration:none;display:inline-block}
+    .btn-primary{background:#6366f1;color:white;box-shadow:0 6px 16px #6366f133}
+    .btn-secondary{background:#374151;color:#e2e8f0;border:1px solid #4b5563}
+    button:hover,.btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px)}
+    .feature-list{text-align:left;background:#1e293b;border-radius:12px;padding:1.5rem;margin:2rem 0}
+    .feature-list h3{color:#60a5fa;margin-top:0}
+    .feature-list ul{list-style:none;padding:0}
+    .feature-list li{padding:8px 0;border-bottom:1px solid #374151}
+    .feature-list li:last-child{border-bottom:none}
+    .feature-list li::before{content:'✅';margin-right:8px}
+    footer{text-align:center;opacity:.6;font-size:.9rem;margin-top:3rem}
   </style>
 </head>
 <body>
-  <h1>🚀 Demo Okta</h1>
-  <p>Bienvenido a tu entorno de prueba con Okta.  
-  Esta app demuestra el flujo <b>Authorization Code</b></p>
-  <button onclick="window.location.href='/login'">Iniciar sesión</button>
-<p><button onclick="goConsole()">Abrir API Console</button></p>
+  <div class="container">
+    <h1>🚀 Okta API Lab</h1>
+    <p class="description">
+      Laboratorio de práctica para autenticación y autorización con Okta. 
+      Explora diferentes scopes, endpoints protegidos y manejo de tokens JWT.
+    </p>
 
-  <footer>Render + GitHub • Node.js + OktaAuthJS</footer>
+    <div class="scope-cards">
+      <div class="scope-card">
+        <h3>👥 Gestión de Usuarios</h3>
+        <p><span class="scope-badge">user.read</span> <span class="scope-badge">user.write</span></p>
+        <p>Lee y crea usuarios. Prueba endpoints con diferentes niveles de acceso.</p>
+      </div>
+      
+      <div class="scope-card">
+        <h3>🛍️ Gestión de Productos</h3>
+        <p><span class="scope-badge">product.read</span> <span class="scope-badge">product.write</span></p>
+        <p>Administra productos. Ideal para practicar autorización basada en recursos.</p>
+      </div>
+      
+      <div class="scope-card">
+        <h3>⚡ Administración</h3>
+        <p><span class="scope-badge">admin</span></p>
+        <p>Acceso completo del sistema. Estadísticas y operaciones críticas.</p>
+      </div>
+    </div>
+
+    <div class="feature-list">
+      <h3>🎯 Funcionalidades del Lab</h3>
+      <ul>
+        <li>Autenticación PKCE con Okta Authorization Server</li>
+        <li>Verificación de tokens JWT con diferentes scopes</li>
+        <li>Endpoints públicos y protegidos</li>
+        <li>Consola interactiva para probar APIs</li>
+        <li>Manejo de errores 401/403 detallado</li>
+        <li>Logging de requests para debugging</li>
+      </ul>
+    </div>
+
+    <div class="buttons">
+      <button class="btn-primary" onclick="window.location.href='/login'">🔑 Iniciar Sesión</button>
+      <button class="btn-secondary" onclick="goConsole()">🔧 API Console</button>
+      <button class="btn-secondary" onclick="window.location.href='/api/info'">📋 Info del API</button>
+    </div>
+
+    <footer>
+      <p>Okta API Lab • Node.js + Express + Okta JWT Verifier</p>
+      <p>Endpoints disponibles: /api/users, /api/products, /api/admin/stats</p>
+    </footer>
+  </div>
 </body>
 </html>
 

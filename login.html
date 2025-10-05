@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <title>Redirigiendo a Okta...</title>
+  <title>Iniciando sesión con Okta...</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
@@ -14,46 +14,134 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      min-height: 100vh;
       text-align: center;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 500px;
+      background: #1e293b;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
     h1 {
-      font-size: 1.6rem;
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      color: #60a5fa;
+    }
+    .scopes-info {
+      background: #111827;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      text-align: left;
+    }
+    .scopes-info h3 {
+      color: #a5b4fc;
+      margin-top: 0;
       margin-bottom: 1rem;
     }
+    .scope-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #374151;
+    }
+    .scope-item:last-child {
+      border-bottom: none;
+    }
+    .scope-badge {
+      background: #374151;
+      color: #a5b4fc;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
     .spinner {
-      margin-top: 20px;
-      width: 60px;
-      height: 60px;
-      border: 6px solid #1e293b;
+      margin: 1.5rem auto;
+      width: 50px;
+      height: 50px;
+      border: 4px solid #1e293b;
       border-top-color: #6366f1;
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    small { opacity: .7; margin-top: 1rem; display: block; }
+    .status {
+      color: #10b981;
+      font-weight: 600;
+      margin-top: 1rem;
+    }
+    small { 
+      opacity: .7; 
+      margin-top: 1rem; 
+      display: block; 
+      line-height: 1.4;
+    }
   </style>
   <script src="https://global.oktacdn.com/okta-auth-js/7.4.1/okta-auth-js.min.js"></script>
 </head>
 <body>
-  <h1>🔐 Redirigiendo a Okta...</h1>
-  <div class="spinner"></div>
-  <small>Por favor espera un momento.</small>
+  <div class="container">
+    <h1>🔐 Autenticación Okta</h1>
+    
+    <div class="scopes-info">
+      <h3>🎯 Scopes Solicitados</h3>
+      <div class="scope-item">
+        <span>Información básica</span>
+        <span class="scope-badge">openid, profile, email</span>
+      </div>
+      <div class="scope-item">
+        <span>Lectura de usuarios</span>
+        <span class="scope-badge">user.read</span>
+      </div>
+      <div class="scope-item">
+        <span>Escritura de usuarios</span>
+        <span class="scope-badge">user.write</span>
+      </div>
+      <div class="scope-item">
+        <span>Lectura de productos</span>
+        <span class="scope-badge">product.read</span>
+      </div>
+      <div class="scope-item">
+        <span>Escritura de productos</span>
+        <span class="scope-badge">product.write</span>
+      </div>
+      <div class="scope-item">
+        <span>Administración</span>
+        <span class="scope-badge">admin</span>
+      </div>
+    </div>
+
+    <div class="spinner"></div>
+    <div class="status">Redirigiendo a Okta...</div>
+    
+    <small>
+      Se solicitarán todos los scopes disponibles para que puedas probar 
+      todos los endpoints del API Lab. El usuario puede aceptar o rechazar los permisos.
+    </small>
+  </div>
 
   <script>
     const authClient = new OktaAuth({
       issuer: 'https://fernandosandbox.oktapreview.com/oauth2/ausbxl4gmakGkhLXy0x7',
       clientId: '0oabxlr5i4pTyCaAM0x7',
       redirectUri: window.location.origin + '/callback',
-      scopes: ['openid','profile','email','user.read'],
+      scopes: ['openid', 'profile', 'email', 'user.read', 'user.write', 'product.read', 'product.write', 'admin'],
       pkce: true,
       tokenManager: { storage: 'sessionStorage' }
     });
 
+    // Provide a global name for debugging and console helpers
+    window.okta = authClient;
+
     // Redirige automáticamente a Okta con un pequeño retraso visual
     setTimeout(() => {
       authClient.token.getWithRedirect({ responseType: 'code' });
-    }, 1000);
+    }, 2000);
   </script>
 </body>
 </html>
