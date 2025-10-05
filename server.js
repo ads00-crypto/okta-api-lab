@@ -7,6 +7,8 @@ const PORT = process.env.PORT || 3000;
 app.get('/', (_r,res)=>res.sendFile(path.join(__dirname,'index.html')));
 app.get('/login', (_r,res)=>res.sendFile(path.join(__dirname,'login.html')));
 app.get('/callback', (_r,res)=>res.sendFile(path.join(__dirname,'callback.html')));
+app.get('/profile', (_req, res) => res.sendFile(path.join(__dirname, 'profile.html')));
+
 
 // salud opcional
 app.get('/health', (_r,res)=>res.send('ok'));
