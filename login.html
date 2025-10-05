@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Login PKCE</title>
+  <script src="https://global.oktacdn.com/okta-auth-js/7.4.1/okta-auth-js.min.js"></script>
+</head>
+<body>
+  <h2>🔐 Okta PKCE Demo</h2>
+  <button id="loginBtn">Iniciar sesión</button>
+  <pre id="output"></pre>
+
+  <script>
+const authClient = new OktaAuth({
+  issuer: 'https://fernandosandbox.oktapreview.com/oauth2/ausbxl4gmakGkhLXy0x7',
+  clientId: '0oabxlr5i4pTyCaAM0x7',
+  redirectUri: window.location.origin + '/callback',
+  scopes: ['openid','profile','email','user.read'],
+  pkce: true,
+  tokenManager: { storage: 'sessionStorage' } // o 'memory'
+});
+
+
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+      const tokenParams = { responseType: 'code' };
+      const { tokens } = await authClient.token.getWithRedirect(tokenParams);
+    });
+  </script>
+</body>
+</html>
