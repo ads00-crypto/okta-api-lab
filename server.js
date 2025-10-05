@@ -37,8 +37,6 @@ function requireScope(scope) {
     } catch (e) { return res.status(401).send('Unauthorized'); }
   };
 }
-app.get('/users',  requireScope('user.read'),  handlerRead);
-app.post('/users', requireScope('user.write'), handlerWrite);
 
 // 🔹 Páginas públicas
 app.get('/', (_r, res) => res.sendFile(path.join(__dirname, 'index.html')));
