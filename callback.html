@@ -1,0 +1,6 @@
+<!-- callback.html -->
+<script src="https://global.oktacdn.com/okta-auth-js/7.4.1/okta-auth-js.min.js"></script>
+<script>
+const authClient=new OktaAuth({issuer:'https://fernandosandbox.oktapreview.com/oauth2/ausbxl4gmakGkhLXy0x7',clientId:'0oabxlr5i4pTyCaAM0x7',redirectUri:window.location.origin+'/callback',scopes:['openid','profile','email','user.read'],pkce:true,tokenManager:{storage:'sessionStorage'}});
+authClient.token.parseFromUrl().then(({tokens})=>{authClient.tokenManager.setTokens(tokens);document.body.textContent='✅ Tokens OK';}).catch(e=>document.body.textContent='❌ '+e);
+</script>
