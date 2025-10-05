@@ -2,18 +2,27 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <title>Callback • Tokens</title>
+  <title>Callback • Tokens recibidos</title>
   <meta http-equiv="Content-Security-Policy"
         content="default-src 'self' https://global.oktacdn.com https://*.oktapreview.com https://*.okta.com;
-                 style-src 'self' 'unsafe-inline';">
+                 style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://global.oktacdn.com;">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body{font-family:system-ui,Arial;margin:0;background:#0f172a;color:#e2e8f0}
+    .card{max-width:760px;margin:3rem auto;padding:2rem;border-radius:16px;background:#111827;box-shadow:0 10px 30px #0006}
+    h1{margin:0 0 1rem;font-size:1.6rem}
+    pre{white-space:pre-wrap;background:#0b1220;padding:12px;border-radius:10px}
+    button{padding:.6rem 1rem;border:0;border-radius:10px;background:#334155;color:#fff;cursor:pointer}
+    button:hover{filter:brightness(1.2)}
+  </style>
   <script src="https://global.oktacdn.com/okta-auth-js/7.4.1/okta-auth-js.min.js"></script>
-  <style>body{font-family:system-ui,Arial;background:#0f172a;color:#e2e8f0;margin:0;padding:2rem}
-  .card{max-width:760px;margin:2rem auto;padding:1.5rem;border-radius:14px;background:#111827}</style>
 </head>
 <body>
   <div class="card">
-    <h2>Procesando tokens…</h2>
-    <pre id="out">Cargando…</pre>
+    <h1>✅ Tokens recibidos correctamente</h1>
+    <p>Información parcial (ocultamos parte de los tokens por seguridad):</p>
+    <pre id="output">Procesando...</pre>
+    <button onclick="window.location.href='/'">Volver al inicio</button>
   </div>
 
 <script>
@@ -31,14 +40,14 @@ function mask(t){return t? t.slice(0,16)+'…'+t.slice(-16):'(sin valor)';}
 okta.token.parseFromUrl()
   .then(({tokens})=>{
     okta.tokenManager.setTokens(tokens);
-    const idt = tokens.idToken?.idToken;
-    const act = tokens.accessToken?.accessToken;
-    document.getElementById('out').textContent =
-      '✅ Tokens OK\nID Token: '+mask(idt)+'\nAccess Token: '+mask(act)+
-      '\nClaims:\n'+JSON.stringify(tokens.idToken?.claims,null,2);
+    const idt=tokens.idToken?.idToken;
+    const act=tokens.accessToken?.accessToken;
+    document.getElementById('output').textContent =
+      '✅ Tokens OK\n\nID Token:\n'+mask(idt)+'\n\nAccess Token:\n'+mask(act)+
+      '\n\nClaims:\n'+JSON.stringify(tokens.idToken?.claims,null,2);
   })
   .catch(e=>{
-    document.getElementById('out').textContent = '❌ Error: '+e;
+    document.getElementById('output').textContent='❌ Error: '+e;
     console.error(e);
   });
 </script>
