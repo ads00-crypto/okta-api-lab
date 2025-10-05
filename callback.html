@@ -3,93 +3,44 @@
 <head>
   <meta charset="utf-8" />
   <title>Callback • Tokens</title>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://global.oktacdn.com https://*.oktapreview.com https://*.okta.com; style-src 'self' 'unsafe-inline';"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    body{font-family:system-ui,Arial;margin:0;background:#0f172a;color:#e2e8f0}
-    .card{max-width:760px;margin:3rem auto;padding:2rem;border-radius:16px;background:#111827;box-shadow:0 10px 30px #0006}
-    h1{margin:0 0 8px;font-size:1.6rem}
-    .grid{display:grid;gap:12px}
-    pre{white-space:pre-wrap;background:#0b1220;padding:12px;border-radius:10px}
-    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    button{padding:.6rem .9rem;border-radius:10px;border:0;background:#334155;color:#fff;cursor:pointer}
-    button.primary{background:#22c55e}
-    button.warn{background:#ef4444}
-    small{opacity:.8}
-  </style>
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self' https://global.oktacdn.com https://*.oktapreview.com https://*.okta.com;
+                 style-src 'self' 'unsafe-inline';">
   <script src="https://global.oktacdn.com/okta-auth-js/7.4.1/okta-auth-js.min.js"></script>
+  <style>body{font-family:system-ui,Arial;background:#0f172a;color:#e2e8f0;margin:0;padding:2rem}
+  .card{max-width:760px;margin:2rem auto;padding:1.5rem;border-radius:14px;background:#111827}</style>
 </head>
 <body>
   <div class="card">
-    <h1>✅ Tokens recibidos</h1>
-    <div class="row" style="margin:10px 0 20px">
-      <button onclick="goHome()">Inicio</button>
-      <button class="primary" onclick="callAPI()">Probar llamada a /protected (Bearer)</button>
-      <button class="warn" onclick="logout()">Logout</button>
-    </div>
-    <div class="grid">
-      <div>
-        <strong>ID Token (parcial)</strong>
-        <pre id="idtok">Cargando…</pre>
-        <button onclick="copyText('idtok')">Copiar</button>
-      </div>
-      <div>
-        <strong>Access Token (parcial)</strong>
-        <pre id="acctok">Cargando…</pre>
-        <button onclick="copyText('acctok')">Copiar</button>
-      </div>
-      <div>
-        <strong>Claims (ID Token)</strong>
-        <pre id="claims">Cargando…</pre>
-      </div>
-      <small>Mostramos los tokens recortados (primeros/últimos 16 chars) por seguridad.</small>
-    </div>
+    <h2>Procesando tokens…</h2>
+    <pre id="out">Cargando…</pre>
   </div>
 
-  <script>
-    const okta = new OktaAuth({
-      issuer: '	https://fernandosandbox.oktapreview.com/oauth2/ausbxl4gmakGkhLXy0x7',
-      clientId: '0oabxlr5i4pTyCaAM0x7',
-      redirectUri: window.location.origin + '/callback',
-      scopes: ['openid','profile','email','user.read'],
-      pkce: true,
-      tokenManager: { storage: 'sessionStorage' }
-    });
+<script>
+const okta = new OktaAuth({
+  issuer: 'https://fernandosandbox.oktapreview.com/oauth2/ausbxl4gmakGkhLXy0x7',
+  clientId: '0oabxlr5i4pTyCaAM0x7',
+  redirectUri: window.location.origin + '/callback',
+  scopes: ['openid','profile','email','user.read'],
+  pkce: true,
+  tokenManager: { storage: 'sessionStorage' }
+});
 
-    function mask(t){ if(!t) return '(sin valor)'; return t.slice(0,16)+'…'+t.slice(-16); }
-    function copyText(id){ navigator.clipboard.writeText(document.getElementById(id).textContent); }
-    function goHome(){ location.href = '/login'; }
+function mask(t){return t? t.slice(0,16)+'…'+t.slice(-16):'(sin valor)';}
 
-    async function render() {
-      try {
-        const { tokens } = await okta.token.parseFromUrl(); // code -> tokens
-        okta.tokenManager.setTokens(tokens);
-
-        const idt = tokens.idToken?.idToken;
-        const act = tokens.accessToken?.accessToken;
-
-        document.getElementById('idtok').textContent = mask(idt);
-        document.getElementById('acctok').textContent = mask(act);
-        document.getElementById('claims').textContent = JSON.stringify(tokens.idToken?.claims, null, 2);
-      } catch (e) {
-        document.body.innerHTML = '<div class="card"><h1>❌ Error</h1><pre>'+e+'</pre><button onclick="goHome()">Volver</button></div>';
-      }
-    }
-
-    async function callAPI(){
-      const { accessToken } = await okta.tokenManager.getTokens();
-      const res = await fetch('/protected',{ headers:{ Authorization:'Bearer '+accessToken.accessToken }});
-      const txt = await res.text();
-      alert('Respuesta /protected: '+txt);
-    }
-
-    async function logout(){
-      await okta.signOut();
-      sessionStorage.clear();
-      location.href = '/login';
-    }
-
-    render();
-  </script>
+okta.token.parseFromUrl()
+  .then(({tokens})=>{
+    okta.tokenManager.setTokens(tokens);
+    const idt = tokens.idToken?.idToken;
+    const act = tokens.accessToken?.accessToken;
+    document.getElementById('out').textContent =
+      '✅ Tokens OK\nID Token: '+mask(idt)+'\nAccess Token: '+mask(act)+
+      '\nClaims:\n'+JSON.stringify(tokens.idToken?.claims,null,2);
+  })
+  .catch(e=>{
+    document.getElementById('out').textContent = '❌ Error: '+e;
+    console.error(e);
+  });
+</script>
 </body>
 </html>
