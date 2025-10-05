@@ -18,7 +18,21 @@
   <p>Bienvenido a tu entorno de prueba con Okta.  
   Esta app demuestra el flujo <b>Authorization Code</b></p>
   <button onclick="window.location.href='/login'">Iniciar sesión</button>
-  <p><button onclick="window.location.href='/api-console'">Abrir API Console</button></p>
+<p><button onclick="goConsole()">Abrir API Console</button></p>
+
   <footer>Render + GitHub • Node.js + OktaAuthJS</footer>
 </body>
 </html>
+
+<script>
+  // Si hay sesión (tokens en sessionStorage) va a /api-console; si no, a /login
+  function goConsole() {
+    try {
+      const hasTokens = !!sessionStorage.getItem('okta-token-storage');
+      location.href = hasTokens ? '/api-console' : '/login';
+    } catch (e) {
+      location.href = '/login';
+    }
+  }
+</script>
+
