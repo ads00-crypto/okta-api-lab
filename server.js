@@ -2,7 +2,6 @@ const express = require('express');
 const path = require('path');
 const OktaJwtVerifier = require('@okta/jwt-verifier');
 const app = express();
-app.get('/', (_req, res) => res.send('AUTHFLOW ONLINE ✅ ' + new Date().toISOString()));
 const PORT = process.env.PORT || 3000;
 
 // 🔹 Middleware para parsing JSON
